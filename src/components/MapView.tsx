@@ -1,8 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import styled from 'styled-components';
-import { Hotel } from '../interfaces/Hotel';
+import { formatPrice } from '../utils/utils';
 import { MapContainer } from '../styles/components/MapViewStyled';
 import useHotels from '../store/hotelStore';
 
@@ -43,7 +42,7 @@ const MapView: React.FC = () => {
           .setPopup(
             new mapboxgl.Popup({ offset: 25 }).setHTML(`
               <h3>${hotel.name}</h3>
-              <p>${hotel.finalPrice}</p>
+              <p>${formatPrice(hotel.finalPrice)}</p>
               <p>${'⭐'.repeat(hotel.star)}</p>
             `)
           )
