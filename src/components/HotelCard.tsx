@@ -1,5 +1,6 @@
-import React from "react";
-
+import React from 'react';
+import {useTranslations} from 'next-intl';
+import { formatPrice } from '../utils/utils';
 import {
   CardContainer,
   ImageContainer,
@@ -15,7 +16,7 @@ import {
   FeaturesContainer,
   Feature,
   Button,
-} from "../styles/components/HotelCardStyled";
+} from '../styles/components/HotelCardStyled';
 
 // Definición de tipos
 interface Hotel {
@@ -36,6 +37,7 @@ interface HotelCardProps {
 }
 
 const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
+  const t = useTranslations();
   return (
     <CardContainer>
       <ImageContainer>
@@ -45,16 +47,16 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
         <div>
           <HotelName>{hotel.name}</HotelName>
           <RatingContainer>
-            <StarRating>{"⭐".repeat(hotel.star)}</StarRating>
+            <StarRating>{'⭐'.repeat(hotel.star)}</StarRating>
             <span>{hotel.star}</span>
           </RatingContainer>
           <Distance>
             {hotel.coordinates.latitude.toFixed(2)} km from location
           </Distance>
           <PriceContainer>
-            <FinalPrice>${hotel.finalPrice} pp</FinalPrice>
+            <FinalPrice>{formatPrice(hotel.finalPrice)}</FinalPrice>
             {hotel.finalPrice < hotel.originalPrice && (
-              <OriginalPrice>${hotel.originalPrice} pp</OriginalPrice>
+              <OriginalPrice>{formatPrice(hotel.originalPrice)}</OriginalPrice>
             )}
           </PriceContainer>
         </div>
@@ -63,7 +65,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel }) => {
             <Feature key={index}>{feature}</Feature>
           ))}
         </FeaturesContainer>
-        <Button>View details</Button>
+        <Button>{t('label.viewDetails')}</Button>
       </InfoContainer>
     </CardContainer>
   );
