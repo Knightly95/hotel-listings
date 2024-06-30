@@ -38,17 +38,21 @@ const HotelList: React.FC = () => {
   }, [hasMore, paginatedHotels]);
 
   return (
-    <ListContainer>
+    <ListContainer data-testid={`hotel-list-container`}>
       {paginatedHotels.map((hotel, index) => {
         if (index === paginatedHotels.length - 1) {
           return (
-            <CardWrapper key={index} ref={lastHotelRef}>
+            <CardWrapper
+              data-testid={`hotel-card-${index}`}
+              key={index}
+              ref={lastHotelRef}
+            >
               <HotelCard hotel={hotel} />
             </CardWrapper>
           );
         }
         return (
-          <CardWrapper key={index}>
+          <CardWrapper data-testid={`hotel-card-${index}`} key={index}>
             <HotelCard hotel={hotel} />
           </CardWrapper>
         );
