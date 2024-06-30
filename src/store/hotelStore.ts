@@ -44,44 +44,51 @@ const useHotels = create<HotelsState>((set) => ({
   },
   filterAndSortHotels: () => {
     set((state) => {
-      let filteredHotels = state.hotels.filter((hotel: Hotel) => {
-        return Object.keys(state.activeFilters).every((filterKey) => {
-          const filterValues = Array.from(state.activeFilters[filterKey] || []);
+      const { activeFilters, bounds, sortOrder, hotels, pageSize } = state;
+
+      let filteredHotels = hotels.filter((hotel: Hotel) => {
+        return Object.keys(activeFilters).every((filterKey) => {
+          const filterValues = Array.from(activeFilters[filterKey] || []);
           if (filterKey === 'Stars') {
             return filterValues.includes(hotel.star.toString());
           }
           if (filterKey === 'Price Range') {
-            if (filterValues.includes('under-100') && hotel.finalPrice < 100)
+            if (filterValues.includes('under-100') && hotel.finalPrice <= 100)
               return true;
-            if (filterValues.includes('under-200') && hotel.finalPrice < 200)
+            if (filterValues.includes('under-200') && hotel.finalPrice <= 200)
               return true;
-            if (filterValues.includes('under-300') && hotel.finalPrice < 300)
+            if (filterValues.includes('under-300') && hotel.finalPrice <= 300)
               return true;
           }
           return false;
         });
       });
 
-      if (state.bounds) {
+      if (bounds) {
         filteredHotels = filteredHotels.filter((hotel) => {
           const lngLat = new LngLat(
             hotel.coordinates.longitude,
             hotel.coordinates.latitude
           );
-          return state.bounds?.contains(lngLat);
+          return bounds.contains(lngLat);
         });
       }
 
-      if (state.sortOrder === 'price-asc') {
-        filteredHotels.sort((a, b) => a.finalPrice - b.finalPrice);
-      } else {
-        filteredHotels.sort((a, b) => b.finalPrice - a.finalPrice);
-      }
+      filteredHotels.sort((a, b) => {
+        if (sortOrder === 'price-asc') {
+          return a.finalPrice - b.finalPrice;
+        } else {
+          return b.finalPrice - a.finalPrice;
+        }
+      });
+
+      const paginatedHotels = filteredHotels.slice(0, pageSize);
+      const hasMore = filteredHotels.length > pageSize;
 
       return {
         filteredHotels,
-        paginatedHotels: filteredHotels.slice(0, 5),
-        hasMore: filteredHotels.length > 5,
+        paginatedHotels,
+        hasMore,
         currentPage: 1,
       };
     });
