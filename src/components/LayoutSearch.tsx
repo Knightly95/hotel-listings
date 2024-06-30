@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+
 import {
   LayoutContainer,
   HeaderContainer,
@@ -7,11 +9,8 @@ import {
   Sidebar,
   MainContent,
   MapContainer,
-  HomeButton
-} from '../styles/components/LayoutSearchStyled'; // Importa los estilos desde LayoutStyles.tsx
+} from '../styles/components/LayoutSearchStyled';
 
-
-// Definición de props
 interface LayoutProps {
   children: ReactNode;
   sidebar: ReactNode;
@@ -21,11 +20,12 @@ interface LayoutProps {
 // Componente Layout
 const Layout: React.FC<LayoutProps> = ({ children, sidebar, map }) => {
   const router = useRouter();
+  const t = useTranslations();
 
   return (
     <LayoutContainer>
       <HeaderContainer>
-        <h1>Hotel Finder</h1>
+        <h1>{t('hotel-finder')}</h1>
       </HeaderContainer>
       <MainContainer>
         <Sidebar>{sidebar}</Sidebar>
