@@ -11,8 +11,10 @@ const createJestConfig = nextJest({
 const config: Config = {
   coverageProvider: 'v8',
   testEnvironment: 'jsdom',
+  collectCoverage: true,
+  coverageDirectory: "coverage",
   setupFiles: ['jest-canvas-mock'],
-  setupFilesAfterEnv: ["<rootDir>/setupTests.js"],
+  setupFilesAfterEnv: ["<rootDir>/setupTests.tsx"],
   globals: {
     'ts-jest': {
       diagnostics: false,
