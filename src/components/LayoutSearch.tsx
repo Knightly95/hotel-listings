@@ -30,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children, sidebar, map }) => {
       </HeaderContainer>
       <MainContainer>
         <ContentContainer>
-          <Sidebar>{sidebar}</Sidebar>
+          <Sidebar data-testid="filter-sidebar">{sidebar}</Sidebar>
           <MainContent>{children}</MainContent>
         </ContentContainer>
         <MapContainer>{map}</MapContainer>
