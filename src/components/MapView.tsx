@@ -12,14 +12,14 @@ const MapView: React.FC = () => {
   const { paginatedHotels, handleChangeBounds } = useHotels();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]); // Referencia para almacenar marcadores
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
 
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: 'mapbox://styles/mapbox/streets-v11',
-        center: [-16.523, 28.2811], // Coordenadas iniciales (e.g., Nueva York)
+        center: [-16.523, 28.2811], // Coordenadas de Gran Canaria
         zoom: 8.5,
       });
 
@@ -34,7 +34,7 @@ const MapView: React.FC = () => {
     if (mapRef.current) {
       // Eliminar marcadores anteriores
       markersRef.current.forEach((marker) => marker.remove());
-      markersRef.current = []; // Vaciar la referencia de marcadores
+      markersRef.current = []; // Limpiar la referencia de marcadores
 
       // Añadir nuevos marcadores
       const newMarkers = paginatedHotels.map((hotel) => {

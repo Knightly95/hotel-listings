@@ -9,6 +9,7 @@ import {
   Sidebar,
   MainContent,
   MapContainer,
+  ContentContainer,
 } from '../styles/components/LayoutSearchStyled';
 
 interface LayoutProps {
@@ -28,8 +29,10 @@ const Layout: React.FC<LayoutProps> = ({ children, sidebar, map }) => {
         <h1>{t('hotel-finder')}</h1>
       </HeaderContainer>
       <MainContainer>
-        <Sidebar>{sidebar}</Sidebar>
-        <MainContent>{children}</MainContent>
+        <ContentContainer>
+          <Sidebar>{sidebar}</Sidebar>
+          <MainContent>{children}</MainContent>
+        </ContentContainer>
         <MapContainer>{map}</MapContainer>
       </MainContainer>
     </LayoutContainer>

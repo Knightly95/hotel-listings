@@ -8,6 +8,7 @@ export const LayoutContainer = styled.div`
 `;
 
 export const HeaderContainer = styled.header`
+  height: 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,6 +19,7 @@ export const HeaderContainer = styled.header`
 `;
 
 export const MainContainer = styled.main`
+  height: calc(100vh - 60px);
   display: flex;
   flex: 1;
   flex-direction: row;
@@ -27,26 +29,47 @@ export const MainContainer = styled.main`
   }
 `;
 
+export const MainContent = styled.div`
+  width: 100%;
+  padding: 1rem;
+  overflow-y: auto;
+
+  @media (min-width: 1160px) {
+    width: 75%;
+  }
+`;
+
+export const ContentContainer = styled.div`
+  display: flex;
+  flex: 1;
+
+  @media (max-width: 1160px) {
+    flex-direction: column;
+  }
+`;
+
 export const Sidebar = styled.div`
-  width: 15%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   background-color: #fff;
   padding: 1rem;
   border-right: 1px solid #dee2e6;
+
+  @media (max-width: 1160px) {
+    flex-direction: row;
+    justify-content: space-evenly;
+    max-height: 230px;
+  }
+
+  @media (min-width: 1160px) {
+    max-width: 220px;
+  }
 
   @media (max-width: 768px) {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid #dee2e6;
-  }
-`;
-
-export const MainContent = styled.div`
-  width: 50%;
-  padding: 1rem;
-  overflow-y: auto;
-
-  @media (max-width: 768px) {
-    width: 100%;
   }
 `;
 
