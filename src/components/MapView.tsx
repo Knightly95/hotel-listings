@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+
 import { formatPrice } from '../utils/utils';
 import { MapContainer } from '../styles/components/MapViewStyled';
 import useHotels from '../store/hotelStore';

@@ -1,20 +1,21 @@
 // Header.tsx
 import React from 'react';
-import { HeaderContainer, SortSelect } from '../styles/components/HeaderStyled';
+import { useTranslations } from 'next-intl';
 
-// Definición de tipos
-interface HeaderProps {
-  onSortChange: (sortValue: string) => void;
-}
+import { HeaderContainer, SortSelect } from '../styles/components/HeaderStyled';
+import useHotels from '../store/hotelStore';
 
 // Componente Header
-const Header: React.FC<HeaderProps> = ({ onSortChange }) => {
+const Header: React.FC = () => {
+  const { handleSortChange } = useHotels();
+  const t = useTranslations();
+
   return (
     <HeaderContainer>
-      <h1>Hoteles</h1>
-      <SortSelect onChange={(e) => onSortChange(e.target.value)}>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
+      <h1>{t('hotels')}</h1>
+      <SortSelect onChange={(e) => handleSortChange(e.target.value)}>
+        <option value="price-asc">{t('price-asc')}</option>
+        <option value="price-desc">{t('price-desc')}</option>
       </SortSelect>
     </HeaderContainer>
   );

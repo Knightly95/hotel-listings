@@ -1,5 +1,14 @@
-import React, { useState } from 'react';
-import { FilterContainer, Card, FilterTitle, FilterCheckbox } from '../styles/components/FilterSidebarStyled';
+import React from 'react';
+import { useTranslations } from 'next-intl';
+
+import {
+  FilterContainer,
+  Card,
+  FilterTitle,
+  FilterCheckbox,
+} from '../styles/components/FilterSidebarStyled';
+import { formatPrice, getTranslationKey } from '../utils/utils';
+import useHotels from '../store/hotelStore';
 
 // Definición de tipos
 interface FilterOption {
@@ -12,48 +21,42 @@ interface Filter {
   options: FilterOption[];
 }
 
-interface FilterSidebarProps {
-  filters: Filter[];
-  onFilterChange: (filterTitle: string, optionValue: string, isChecked: boolean) => void;
-}
-
-const FilterSidebar: React.FC<FilterSidebarProps> = ({ filters, onFilterChange }) => {
-  const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: Set<string> }>({});
-
-  const handleCheckboxChange = (filterTitle: string, optionValue: string, isChecked: boolean) => {
-    setSelectedFilters((prev) => {
-      const newFilters = { ...prev };
-      if (isChecked) {
-        if (!newFilters[filterTitle]) {
-          newFilters[filterTitle] = new Set();
-        }
-        newFilters[filterTitle].add(optionValue);
-      } else {
-        newFilters[filterTitle]?.delete(optionValue);
-        if (newFilters[filterTitle]?.size === 0) {
-          delete newFilters[filterTitle];
-        }
-      }
-      onFilterChange(filterTitle, optionValue, isChecked);
-      return newFilters;
-    });
-  };
+const FilterSidebar: React.FC = () => {
+  const { filters, handleFilterChange } = useHotels();
+  const t = useTranslations();
 
   return (
     <>
-      {filters.map((filter) => (
+      {filters.map((filter: Filter) => (
         <Card key={filter.title}>
           <FilterContainer>
-            <FilterTitle>{filter.title}</FilterTitle>
+            <FilterTitle>{t(getTranslationKey(filter.title))}</FilterTitle>
             {filter.options.map((option) => (
               <FilterCheckbox key={option.value}>
                 <input
                   type="checkbox"
                   value={option.value}
-                  onChange={(e) => handleCheckboxChange(filter.title, option.value, e.target.checked)}
+                  onChange={(e) =>
+                    handleFilterChange(
+                      filter.title,
+                      option.value,
+                      e.target.checked
+                    )
+                  }
                   data-testid={`checkbox-${option.value}`}
                 />
-                <label>{option.label}</label>
+                <label>
+                  {filter.title === 'Stars'
+                    ? t('star-rating', {
+                        rating: option.value,
+                      })
+                    : t('price-filter', {
+                        price: formatPrice(
+                          Number(option.value.split('-')[1]),
+                          0
+                        ),
+                      })}
+                </label>
               </FilterCheckbox>
             ))}
           </FilterContainer>

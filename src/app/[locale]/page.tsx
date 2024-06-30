@@ -13,13 +13,10 @@ import useHotels from '../../store/hotelStore';
 const Search = () => {
   const {
     hotels,
-    filters,
     bounds,
     sortOrder,
     activeFilters,
     fetchHotelsData,
-    handleSortChange,
-    handleFilterChange,
     filterAndSortHotels,
   } = useHotels();
 
@@ -32,14 +29,9 @@ const Search = () => {
   }, [hotels, sortOrder, activeFilters, bounds]);
 
   return (
-    <LayoutSearch
-      sidebar={
-        <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
-      }
-      map={<MapView />}
-    >
-      <Header onSortChange={handleSortChange} />
-      <HotelList/>
+    <LayoutSearch sidebar={<FilterSidebar />} map={<MapView />}>
+      <Header />
+      <HotelList />
     </LayoutSearch>
   );
 };
