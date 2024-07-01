@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 import { fetchHotels } from '@/src/api/api';
 import { Hotel } from '@/src/interfaces/Hotel';
-import { LngLat } from 'mapbox-gl';
+import { LngLatBounds } from 'mapbox-gl';
 import { filterData } from '@/src/constants/FilterData';
 
 type HotelsState = {
   hotels: Hotel[];
   filteredHotels: Hotel[];
   paginatedHotels: Hotel[];
-  bounds: mapboxgl.LngLatBounds | undefined;
+  bounds: LngLatBounds | undefined;
   sortOrder: string;
   activeFilters: { [key: string]: Set<string> };
   filters: any;
@@ -24,8 +24,49 @@ type HotelsState = {
     isChecked: boolean
   ) => void;
   fetchHotelsData: () => Promise<void>;
-  handleChangeBounds: (bounds: mapboxgl.LngLatBounds | undefined) => void;
+  handleChangeBounds: (bounds: LngLatBounds | undefined) => void;
 };
+
+function getFilteredHotels(hotels: Hotel[], activeFilters: any) {
+  return hotels.filter((hotel: Hotel) => {
+    return Object.keys(activeFilters).every((filterKey) => {
+      const filterValues = Array.from(activeFilters[filterKey] || []);
+      if (filterKey === 'Stars') {
+        return filterValues.includes(hotel.star.toString());
+      }
+      if (filterKey === 'Price Range') {
+        if (filterValues.includes('under-100') && hotel.finalPrice < 100)
+          return true;
+        if (filterValues.includes('under-200') && hotel.finalPrice < 200)
+          return true;
+        if (filterValues.includes('under-300') && hotel.finalPrice < 300)
+          return true;
+      }
+      return false;
+    });
+  });
+}
+
+function getHotelsInBounds(hotels: Hotel[], bounds: LngLatBounds) {
+  return hotels.filter((hotel) => {
+    return bounds.contains([
+      hotel.coordinates.longitude,
+      hotel.coordinates.latitude,
+    ]);
+  });
+}
+
+function sortHotels(hotels: Hotel[], sortOrder: string) {
+  return hotels.sort((a, b) => {
+    if (sortOrder === 'price-asc') {
+      return a.finalPrice - b.finalPrice;
+    }
+    if (sortOrder === 'price-desc') {
+      return b.finalPrice - a.finalPrice;
+    }
+    return 0;
+  });
+}
 
 const useHotels = create<HotelsState>((set) => ({
   hotels: [],
@@ -46,42 +87,13 @@ const useHotels = create<HotelsState>((set) => ({
     set((state) => {
       const { activeFilters, bounds, sortOrder, hotels, pageSize } = state;
 
-      let filteredHotels = hotels.filter((hotel: Hotel) => {
-        return Object.keys(activeFilters).every((filterKey) => {
-          const filterValues = Array.from(activeFilters[filterKey] || []);
-          if (filterKey === 'Stars') {
-            return filterValues.includes(hotel.star.toString());
-          }
-          if (filterKey === 'Price Range') {
-            if (filterValues.includes('under-100') && hotel.finalPrice < 100)
-              return true;
-            if (filterValues.includes('under-200') && hotel.finalPrice < 200)
-              return true;
-            if (filterValues.includes('under-300') && hotel.finalPrice < 300)
-              return true;
-          }
-          return false;
-        });
-      });
+      let filteredHotels = getFilteredHotels(hotels, activeFilters);
 
       if (bounds) {
-        filteredHotels = filteredHotels.filter((hotel) => {
-          const lngLat = new LngLat(
-            hotel.coordinates.longitude,
-            hotel.coordinates.latitude
-          );
-          return bounds.contains(lngLat);
-        });
+        filteredHotels = getHotelsInBounds(filteredHotels, bounds);
       }
 
-      filteredHotels.sort((a, b) => {
-        if (sortOrder === 'price-asc') {
-          return a.finalPrice - b.finalPrice;
-        } else {
-          return b.finalPrice - a.finalPrice;
-        }
-      });
-
+      filteredHotels = sortHotels(filteredHotels, sortOrder);
       const paginatedHotels = filteredHotels.slice(0, pageSize);
       const hasMore = filteredHotels.length > pageSize;
 
