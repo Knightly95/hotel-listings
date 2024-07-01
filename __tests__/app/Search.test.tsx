@@ -2,24 +2,6 @@ import { render, screen, act } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
 import Search from '@/src/app/[locale]/page';
 import messages from '@/messages/en.json';
-import fetchDataResponse from '@/mocks/fetchDataResponse';
-
-global.fetch = jest.fn(
-  () =>
-    Promise.resolve({
-      json: () => Promise.resolve(fetchDataResponse),
-    }) as Promise<Response>
-);
-
-jest.mock('next/navigation', () => ({
-  useRouter() {
-    return {
-      prefetch: () => null,
-      useParams: () => ({ locale: 'en' }),
-      useSelectedLayoutSegment: () => ({ locale: 'en' }),
-    };
-  },
-}));
 
 describe('Search', () => {
   beforeEach(() => {
