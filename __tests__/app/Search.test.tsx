@@ -1,8 +1,8 @@
-import { render, screen, act , renderHook} from '@testing-library/react';
-import Search from '../../src/app/[locale]/page';
+import { render, screen, act } from '@testing-library/react';
 import { NextIntlClientProvider } from 'next-intl';
-import messages from '../../messages/en.json';
-import fetchDataResponse from '../../mocks/fetchDataResponse';
+import Search from '@/src/app/[locale]/page';
+import messages from '@/messages/en.json';
+import fetchDataResponse from '@/mocks/fetchDataResponse';
 
 global.fetch = jest.fn(
   () =>

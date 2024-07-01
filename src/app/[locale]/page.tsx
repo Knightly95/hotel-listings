@@ -1,16 +1,26 @@
 'use client';
 
-import FilterSidebar from '@/src/components/FilterSidebar';
-import Header from '@/src/components/Header';
-import HotelList from '@/src/components/HotelList';
-import LayoutSearch from '@/src/components/LayoutSearch';
-import MapView from '@/src/components/MapView';
 import React from 'react';
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
-import useHotels from '../../store/hotelStore';
+import FilterSidebar from '@/src/components/FilterSidebar';
+import Header from '@/src/components/layout/Header';
+import HotelList from '@/src/components/HotelList';
+import MapView from '@/src/components/MapView';
+import {
+  LayoutContainer,
+  HeaderContainer,
+  MainContainer,
+  Sidebar,
+  MainContent,
+  MapContainer,
+  ContentContainer,
+} from '@/src/styles/components/LayoutSearchStyled';
+import useHotels from '@/src/store/hotelStore';
 
 const Search = () => {
+  const t = useTranslations();
   const {
     hotels,
     bounds,
@@ -29,10 +39,25 @@ const Search = () => {
   }, [hotels, sortOrder, activeFilters, bounds]);
 
   return (
-    <LayoutSearch sidebar={<FilterSidebar />} map={<MapView />}>
-      <Header />
-      <HotelList />
-    </LayoutSearch>
+    <LayoutContainer>
+      <HeaderContainer>
+        <h1>{t('hotel-finder')}</h1>
+      </HeaderContainer>
+      <MainContainer>
+        <ContentContainer>
+          <Sidebar data-testid="filter-sidebar">
+            <FilterSidebar />
+          </Sidebar>
+          <MainContent>
+            <Header />
+            <HotelList />
+          </MainContent>
+        </ContentContainer>
+        <MapContainer>
+          <MapView />
+        </MapContainer>
+      </MainContainer>
+    </LayoutContainer>
   );
 };
 

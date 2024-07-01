@@ -5,9 +5,9 @@ import HotelCard from './HotelCard';
 import {
   ListContainer,
   CardWrapper,
-} from '../styles/components/HotelListStyled';
+} from '@/src/styles/components/HotelListStyled';
 
-import useHotels from '../store/hotelStore';
+import useHotels from '@/src/store/hotelStore';
 
 const HotelList: React.FC = () => {
   const { paginatedHotels, hasMore, handleLoadMore } = useHotels();

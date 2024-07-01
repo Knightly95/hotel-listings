@@ -1,4 +1,4 @@
-import { formatPrice, getTranslationKey } from '../../src/utils/utils';
+import { formatPrice, getTranslationKey } from '@/src/utils/utils';
 
 describe('formatPrice', () => {
   it('should format the price correctly', () => {

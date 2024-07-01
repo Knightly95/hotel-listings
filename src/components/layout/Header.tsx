@@ -2,8 +2,11 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 
-import { HeaderContainer, SortSelect } from '../styles/components/HeaderStyled';
-import useHotels from '../store/hotelStore';
+import {
+  HeaderContainer,
+  SortSelect,
+} from '@/src/styles/components/HeaderStyled';
+import useHotels from '@/src/store/hotelStore';
 
 // Componente Header
 const Header: React.FC = () => {

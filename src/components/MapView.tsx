@@ -2,9 +2,9 @@ import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-import { formatPrice } from '../utils/utils';
-import { MapContainer } from '../styles/components/MapViewStyled';
-import useHotels from '../store/hotelStore';
+import { formatPrice } from '@/src/utils/utils';
+import { MapContainer } from '@/src/styles/components/MapViewStyled';
+import useHotels from '@/src/store/hotelStore';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 

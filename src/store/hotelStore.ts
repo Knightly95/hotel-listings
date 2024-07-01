@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { fetchHotels } from '../api/api';
-import { Hotel } from '../interfaces/Hotel';
+import { fetchHotels } from '@/src/api/api';
+import { Hotel } from '@/src/interfaces/Hotel';
 import { LngLat } from 'mapbox-gl';
-import { filterData } from '../constants/FilterData';
+import { filterData } from '@/src/constants/FilterData';
 
 type HotelsState = {
   hotels: Hotel[];
@@ -53,11 +53,11 @@ const useHotels = create<HotelsState>((set) => ({
             return filterValues.includes(hotel.star.toString());
           }
           if (filterKey === 'Price Range') {
-            if (filterValues.includes('under-100') && hotel.finalPrice <= 100)
+            if (filterValues.includes('under-100') && hotel.finalPrice < 100)
               return true;
-            if (filterValues.includes('under-200') && hotel.finalPrice <= 200)
+            if (filterValues.includes('under-200') && hotel.finalPrice < 200)
               return true;
-            if (filterValues.includes('under-300') && hotel.finalPrice <= 300)
+            if (filterValues.includes('under-300') && hotel.finalPrice < 300)
               return true;
           }
           return false;

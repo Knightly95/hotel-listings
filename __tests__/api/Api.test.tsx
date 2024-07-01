@@ -1,6 +1,5 @@
-import { fetchHotels } from '../../src/api/api';
-import fetchDataResponse from '../../mocks/fetchDataResponse';
-
+import { fetchHotels } from '@/src/api/api';
+import fetchDataResponse from '@/mocks/fetchDataResponse';
 
 describe('API Suite', () => {
   it('should fetch hotels successfully', async () => {
