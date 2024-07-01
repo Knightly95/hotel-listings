@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import useHotels from '../../src/store/hotelStore';
+import useHotels from '@/src/store/hotelStore';
 
 describe('useHotels', () => {
   let storedResult;

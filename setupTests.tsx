@@ -50,7 +50,7 @@ global.fetch = jest.fn(
       }) as Promise<Response>
   );
 
-jest.mock('next/navigation', () => ({
+/* jest.mock('next/navigation', () => ({
   useRouter() {
     return {
       prefetch: () => null,
@@ -59,3 +59,4 @@ jest.mock('next/navigation', () => ({
     };
   },
 }));
+ */

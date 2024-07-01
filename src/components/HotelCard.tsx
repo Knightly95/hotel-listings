@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 
-import { formatPrice, getTranslationKey } from '../utils/utils';
+import { formatPrice, getTranslationKey } from '@/src/utils/utils';
 import {
   CardContainer,
   ImageContainer,
@@ -17,8 +17,8 @@ import {
   FeaturesContainer,
   Feature,
   Button,
-} from '../styles/components/HotelCardStyled';
-import { Hotel } from '../interfaces/Hotel';
+} from '@/src/styles/components/HotelCardStyled';
+import { Hotel } from '@/src/interfaces/Hotel';
 
 interface HotelCardProps {
   hotel: Hotel;

@@ -6,9 +6,9 @@ import {
   Card,
   FilterTitle,
   FilterCheckbox,
-} from '../styles/components/FilterSidebarStyled';
-import { formatPrice, getTranslationKey } from '../utils/utils';
-import useHotels from '../store/hotelStore';
+} from '@/src/styles/components/FilterSidebarStyled';
+import { formatPrice, getTranslationKey } from '@/src/utils/utils';
+import useHotels from '@/src/store/hotelStore';
 
 // Definición de tipos
 interface FilterOption {
