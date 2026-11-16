@@ -37,8 +37,8 @@ jobs:
       - name: Type-check
         run: npx tsc --noEmit
 
-      - name: Tests
-        run: npm test
+      - name: Tests with coverage
+        run: npm test -- --coverageReporters=json-summary --coverageReporters=text-summary
 
       - name: Build static site
         run: npm run build
@@ -48,6 +48,10 @@ jobs:
 
       # Stops GitHub Pages from ignoring the _next directory.
       - run: touch out/.nojekyll
+
+      # Published with the site and read by the shields.io badge in the README.
+      - name: Coverage badge data
+        run: node scripts/coverage-badge.mjs coverage/coverage-summary.json out/coverage-badge.json
 
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'

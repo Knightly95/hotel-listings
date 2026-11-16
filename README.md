@@ -1,12 +1,19 @@
 # Hotel Listings
 
 [![CI & Deploy](https://github.com/Knightly95/hotel-listings/actions/workflows/deploy.yml/badge.svg)](https://github.com/Knightly95/hotel-listings/actions/workflows/deploy.yml)
+[![Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fknightly95.github.io%2Fhotel-listings%2Fcoverage-badge.json)](#tests)
 
 **[▶ Live demo](https://knightly95.github.io/hotel-listings/)**: no sign-up, API key or backend is needed.
 
 > **Background:** I built this project in 2024 as a take-home for a frontend technical assessment in a hiring process. The commit history is the original one. I am now modernizing it step by step as a public refactoring exercise; see the [roadmap](#roadmap).
 
 A hotel search page built with Next.js and TypeScript. Hotels are listed next to an interactive map, and the list follows the map: move or zoom the map and only the hotels in view are shown.
+
+## Screenshot
+
+[![Hotel search page: filters on the left, the hotel list in the middle and a map of Tenerife with markers on the right](docs/screenshots/search.png)](docs/screenshots/search.png)
+
+The list shows only the hotels inside the visible map area. Move or zoom the map and the list follows.
 
 ## Features
 
@@ -50,6 +57,15 @@ docker run -p 3000:3000 hotel-listings
 - **Map:** [MapLibre GL](https://maplibre.org/) renders OpenStreetMap data from [OpenFreeMap](https://openfreemap.org/). Neither needs an account or an access token.
 - **State:** a Zustand store holds the hotels, the active filters, the sort order and the map bounds, and derives the visible page of hotels.
 - **Languages:** next-intl with one statically generated page per language.
+
+## Tests
+
+`npm test` runs the Jest and React Testing Library tests for the store, the data generator, the API client, the utilities and the components. CI measures line coverage on every push to `main` and publishes the number shown in the badge above.
+
+## Contributing
+
+- [`CONTRIBUTING.md`](CONTRIBUTING.md): setup, checks, conventions and how to propose a change.
+- [`AGENTS.md`](AGENTS.md): commands, rules and guardrails for AI coding agents.
 
 ## Deployment
 
