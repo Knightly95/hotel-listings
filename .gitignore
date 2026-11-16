@@ -4,3 +4,6 @@ node_modules
 coverage
 # static export
 out
+
+# TypeScript build info
+*.tsbuildinfo
