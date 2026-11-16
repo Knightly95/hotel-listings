@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { fetchHotels } from '@/src/api/api';
 import { Hotel } from '@/src/interfaces/Hotel';
-import { LngLatBounds } from 'mapbox-gl';
+import type { LngLatBounds } from 'maplibre-gl';
 import { filterData } from '@/src/constants/FilterData';
 
-type HotelsState = {
+export type HotelsState = {
   hotels: Hotel[];
   filteredHotels: Hotel[];
   paginatedHotels: Hotel[];

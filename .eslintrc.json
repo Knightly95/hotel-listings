@@ -1,9 +1,10 @@
 {
-    "extends": [
-        "plugin:jest-dom/recommended",
-        "plugin:testing-library/react"
-    ],
-    "env": {
-        "jest": true
-    }
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:jest-dom/recommended",
+    "plugin:testing-library/react"
+  ],
+  "env": {
+    "jest": true
+  }
 }

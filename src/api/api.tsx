@@ -1,14 +1,11 @@
 import { Hotel } from '../interfaces/Hotel';
 
+/** Set when the app is hosted under a sub-path, e.g. on GitHub Pages. */
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
+export const HOTELS_ENDPOINT = `${BASE_PATH}/api/hotels.json`;
+
 export const fetchHotels = async (): Promise<Hotel[]> => {
-  try {
-    const response = await fetch(
-      'https://my-json-server.typicode.com/example/hotels-api/hotels'
-    );
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    //console.error(error);
-    throw error;
-  }
+  const response = await fetch(HOTELS_ENDPOINT);
+  return response.json();
 };

@@ -1,4 +1,3 @@
-// Header.tsx
 import React from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -8,7 +7,7 @@ import {
 } from '@/src/styles/components/HeaderStyled';
 import useHotels from '@/src/store/hotelStore';
 
-// Componente Header
+// Sort control shown above the hotel list
 const Header: React.FC = () => {
   const { handleSortChange } = useHotels();
   const t = useTranslations();
