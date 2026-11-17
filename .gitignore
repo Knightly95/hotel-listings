@@ -1,5 +1,9 @@
 node_modules
 .next
-package-lock.json
 .env.local
 coverage
+# static export
+out
+
+# TypeScript build info
+*.tsbuildinfo

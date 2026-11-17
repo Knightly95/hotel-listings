@@ -1,43 +1,77 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Hotel Listings
 
-## Getting Started
+[![CI & Deploy](https://github.com/Knightly95/hotel-listings/actions/workflows/deploy.yml/badge.svg)](https://github.com/Knightly95/hotel-listings/actions/workflows/deploy.yml)
 
-First, run the development server:
+**[▶ Live demo](https://knightly95.github.io/hotel-listings/)**: no sign-up, API key or backend is needed.
+
+> **Background:** I built this project in 2024 as a take-home for a frontend technical assessment in a hiring process. The commit history is the original one. I am now modernizing it step by step as a public refactoring exercise; see the [roadmap](#roadmap).
+
+A hotel search page built with Next.js and TypeScript. Hotels are listed next to an interactive map, and the list follows the map: move or zoom the map and only the hotels in view are shown.
+
+## Features
+
+- **Map and list in sync:** the list shows the hotels inside the visible map area, and each hotel has a marker with a popup.
+- **Filters and sorting:** filter by star rating and price range, sort by price.
+- **Infinite scrolling:** more hotels load as you scroll the list.
+- **Two languages:** English and Spanish, with the visitor's browser language picked automatically.
+- **Own API:** `GET /api/hotels.json` serves 300 generated hotels around real towns in Tenerife.
+
+## Tech stack
+
+Next.js 14 (App Router) · TypeScript · Zustand · next-intl · MapLibre GL with OpenFreeMap tiles · styled-components · Jest + React Testing Library
+
+## Getting started
+
+Prerequisite: Node.js 22 or newer.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Script          | What it does                         |
+| --------------- | ------------------------------------ |
+| `npm run dev`   | Start the development server         |
+| `npm run build` | Build for production                 |
+| `npm start`     | Serve the production build           |
+| `npm run lint`  | Run ESLint                           |
+| `npm test`      | Run the tests with a coverage report |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+With Docker:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+docker build -t hotel-listings .
+docker run -p 3000:3000 hotel-listings
+```
 
-## Using Docker
+## How it works
 
-docker build -t hotel-finder .
+- **Data:** [`src/data/hotels.ts`](src/data/hotels.ts) generates the hotels with a seeded random generator, so every build has the same data. The route handler in [`src/app/api/hotels.json/route.ts`](src/app/api/hotels.json/route.ts) serves it and is rendered at build time.
+- **Map:** [MapLibre GL](https://maplibre.org/) renders OpenStreetMap data from [OpenFreeMap](https://openfreemap.org/). Neither needs an account or an access token.
+- **State:** a Zustand store holds the hotels, the active filters, the sort order and the map bounds, and derives the visible page of hotels.
+- **Languages:** next-intl with one statically generated page per language.
 
-docker run -p 3000:3000 nextjs-docker
+## Deployment
 
+Every push to `main` is linted, type-checked, tested, built as a static site and deployed to GitHub Pages by [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
 
-## Learn More
+The static build is switched on with two environment variables:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+STATIC_EXPORT=true NEXT_PUBLIC_BASE_PATH=/hotel-listings npm run build   # output in ./out
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Without them, `npm run build` produces a normal Next.js server build.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Roadmap
 
-## Deploy on Vercel
+This repo is being modernized in small pull requests, each with its own before and after measurements:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. ✅ Remove the dependency on third-party services and access tokens; add CI and a live demo.
+2. Upgrade to the current Next.js and React versions.
+3. Migrate styled-components to Tailwind CSS, one component per pull request.
+4. Move data fetching to TanStack Query and server components.
+5. Replace the Cypress tests with Playwright and run them in CI.
+6. Add German and Dutch.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The Cypress end-to-end tests in [`cypress/`](cypress) are from the original version and are not part of CI yet (step 5).

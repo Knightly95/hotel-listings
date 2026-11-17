@@ -1,29 +1,28 @@
 import '@testing-library/jest-dom/';
 import fetchDataResponse from './/mocks/fetchDataResponse';
 
-jest.mock('mapbox-gl/dist/mapbox-gl', () => ({
-  Marker: jest.fn(() => ({
-    setLngLat: jest.fn().mockReturnThis(),
-    setPopup: jest.fn().mockReturnThis(),
-    addTo: jest.fn(),
-  })),
-  Popup: jest.fn(() => ({
-    setLngLat: jest.fn().mockReturnThis(),
-    setHTML: jest.fn().mockReturnThis(),
-    addTo: jest.fn(),
-  })),
-  LngLat: jest.fn(),
-  GeolocateControl: jest.fn(),
-  Map: jest.fn(() => ({
-    addControl: jest.fn(),
-    on: jest.fn(),
-    remove: jest.fn(),
-    getBounds: jest.fn(() => {
-      contains: jest.fn(() => true);
-    }),
-  })),
-  NavigationControl: jest.fn(),
-}));
+jest.mock('maplibre-gl', () => {
+  const api = {
+    Marker: jest.fn(() => ({
+      setLngLat: jest.fn().mockReturnThis(),
+      setPopup: jest.fn().mockReturnThis(),
+      addTo: jest.fn().mockReturnThis(),
+      remove: jest.fn(),
+    })),
+    Popup: jest.fn(() => ({
+      setLngLat: jest.fn().mockReturnThis(),
+      setDOMContent: jest.fn().mockReturnThis(),
+      addTo: jest.fn().mockReturnThis(),
+    })),
+    Map: jest.fn(() => ({
+      addControl: jest.fn(),
+      on: jest.fn(),
+      remove: jest.fn(),
+      getBounds: jest.fn(() => ({ contains: jest.fn(() => true) })),
+    })),
+  };
+  return { __esModule: true, default: api, ...api };
+});
 
 class IntersectionObserver {
   observe = jest.fn();

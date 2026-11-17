@@ -1,8 +1,9 @@
 import { act, renderHook } from '@testing-library/react';
-import useHotels from '@/src/store/hotelStore';
+import useHotels, { type HotelsState } from '@/src/store/hotelStore';
+import type { LngLatBounds } from 'maplibre-gl';
 
 describe('useHotels', () => {
-  let storedResult;
+  let storedResult: { current: HotelsState };
   beforeEach(async () => {
     const { result } = renderHook(() => useHotels());
 
@@ -67,7 +68,7 @@ describe('useHotels', () => {
 
   test('handleChangeBounds should update bounds state', () => {
     act(() => {
-      storedResult.current.handleChangeBounds({});
+      storedResult.current.handleChangeBounds({} as unknown as LngLatBounds);
     });
 
     expect(storedResult.current.bounds).toBeDefined();
@@ -78,7 +79,7 @@ describe('useHotels', () => {
     act(() => {
       storedResult.current.handleChangeBounds({
         contains: jest.fn(() => false),
-      });
+      } as unknown as LngLatBounds);
       storedResult.current.filterAndSortHotels();
     });
 
