@@ -1,4 +1,4 @@
-import { generateHotels, HOTEL_COUNT } from '@/src/data/hotels';
+import { generateHotels, HOTEL_COUNT, PHOTO_COUNT } from '@/src/data/hotels';
 import { getTranslationKey } from '@/src/utils/utils';
 import en from '@/messages/en.json';
 import es from '@/messages/es.json';
@@ -26,6 +26,24 @@ describe('Hotels dataset', () => {
       expect(hotel.coordinates.longitude).toBeGreaterThan(-17);
       expect(hotel.coordinates.longitude).toBeLessThan(-16.1);
     }
+  });
+
+  it('gives every hotel an id, a town and one of the bundled photos', () => {
+    expect(new Set(hotels.map((hotel) => hotel.id)).size).toBe(HOTEL_COUNT);
+    for (const hotel of hotels) {
+      expect(hotel.name).toContain(hotel.town);
+      expect(hotel.image).toMatch(/^images\/hotels\/\d{2}\.webp$/);
+      const photo = Number(hotel.image.match(/(\d{2})\.webp$/)?.[1]);
+      expect(photo).toBeGreaterThanOrEqual(1);
+      expect(photo).toBeLessThanOrEqual(PHOTO_COUNT);
+    }
+  });
+
+  it('never shows the same photo twice in a row when sorted by price', () => {
+    const byPrice = [...hotels].sort((a, b) => a.finalPrice - b.finalPrice);
+    byPrice.slice(1).forEach((hotel, index) => {
+      expect(hotel.image).not.toBe(byPrice[index].image);
+    });
   });
 
   it('only uses features that are translated in every language', () => {

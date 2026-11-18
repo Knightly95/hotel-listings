@@ -11,3 +11,7 @@ out
 # Lighthouse CI
 .lighthouseci
 lighthouse-report
+
+# Playwright
+test-results
+playwright-report

@@ -14,16 +14,30 @@ jest.mock('maplibre-gl', () => {
       setLngLat: jest.fn().mockReturnThis(),
       setDOMContent: jest.fn().mockReturnThis(),
       addTo: jest.fn().mockReturnThis(),
+      remove: jest.fn(),
     })),
+    NavigationControl: jest.fn(),
     Map: jest.fn(() => ({
       addControl: jest.fn(),
       on: jest.fn(),
       remove: jest.fn(),
+      resize: jest.fn(),
+      flyTo: jest.fn(),
+      fitBounds: jest.fn(),
       getBounds: jest.fn(() => ({ contains: jest.fn(() => true) })),
     })),
   };
   return { __esModule: true, default: api, ...api };
 });
+
+// jsdom has no modal dialogs: open and close the element directly.
+HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
+  this.open = true;
+};
+HTMLDialogElement.prototype.close = function close(this: HTMLDialogElement) {
+  this.open = false;
+  this.dispatchEvent(new Event('close'));
+};
 
 class IntersectionObserver {
   observe = jest.fn();

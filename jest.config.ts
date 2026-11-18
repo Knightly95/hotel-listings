@@ -15,6 +15,8 @@ const config: Config = {
   coverageDirectory: "coverage",
   setupFiles: ['jest-canvas-mock'],
   setupFilesAfterEnv: ["<rootDir>/setupTests.tsx"],
+  // The browser tests in e2e/ run with Playwright, not Jest.
+  testPathIgnorePatterns: ["/node_modules/", "/e2e/"],
   globals: {
     'ts-jest': {
       diagnostics: false,
