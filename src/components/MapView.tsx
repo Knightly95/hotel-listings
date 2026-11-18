@@ -58,16 +58,23 @@ const MapView: React.FC = () => {
     if (!map) return;
 
     markersRef.current.forEach((marker) => marker.remove());
-    markersRef.current = paginatedHotels.map((hotel) =>
-      new maplibregl.Marker()
+    markersRef.current = paginatedHotels.map((hotel) => {
+      const marker = new maplibregl.Marker()
         .setLngLat([hotel.coordinates.longitude, hotel.coordinates.latitude])
         .setPopup(
           new maplibregl.Popup({ offset: 25 }).setDOMContent(
             buildPopupContent(hotel)
           )
         )
-        .addTo(map)
-    );
+        .addTo(map);
+      // MapLibre makes the marker focusable and labels it "Map marker", but
+      // gives it no role, which is invalid ARIA. It opens a popup, so it is a
+      // button, named after its hotel.
+      const element = marker.getElement();
+      element.setAttribute('role', 'button');
+      element.setAttribute('aria-label', hotel.name);
+      return marker;
+    });
   }, [paginatedHotels]);
 
   return <MapContainer ref={mapContainerRef} />;

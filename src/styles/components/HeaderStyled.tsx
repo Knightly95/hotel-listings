@@ -8,6 +8,10 @@ export const HeaderContainer = styled.div`
   padding: 0.5rem 1rem;
   background-color: #fff;
   border-bottom: 1px solid #dee2e6;
+
+  h2 {
+    font-size: 2em;
+  }
 `;
 
 export const SortSelect = styled.select`
