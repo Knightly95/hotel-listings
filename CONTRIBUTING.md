@@ -63,7 +63,7 @@ The full reference is [AGENTS.md](AGENTS.md), which people and AI coding agents 
 - Tests are in `__tests__/`, in a folder that mirrors `src/` (`components`, `store`, `utils` and so on), named `Name.test.tsx`.
 - They use Jest and React Testing Library. Query by role and label, as a user would.
 - Add or update tests in the same pull request as the behaviour change. A bug fix comes with a test that fails without the fix.
-- The Cypress tests in `cypress/` are from the original version and aren't run in CI. They will be replaced by Playwright (roadmap step 5), so don't add new ones.
+- Browser tests are Playwright specs in `e2e/`, run in CI against the static build. To run them locally: `STATIC_EXPORT=true npm run build && npm run test:e2e`.
 
 ## Reporting a bug
 

@@ -88,6 +88,13 @@ const FEATURES = [
   'Kitchenette',
 ];
 
+/**
+ * Hotel photos in `public/images/hotels`, from Unsplash (see
+ * `docs/photo-credits.md`). They are handed out in price order, so
+ * hotels next to each other in a list sorted by price never share a photo.
+ */
+export const PHOTO_COUNT = 29;
+
 /** Roughly 600 m: keeps hotels close to their town. */
 const COORDINATE_JITTER = 0.006;
 
@@ -128,17 +135,28 @@ export function generateHotels(count = HOTEL_COUNT, seed = 2024): Hotel[] {
     }
 
     hotels.push({
+      id: `hotel-${i + 1}`,
       name: `${pick(NAME_PREFIXES)} ${pick(NAME_SUFFIXES)} ${town.name}`,
+      town: town.name,
       finalPrice,
       originalPrice,
       star,
       features,
-      image: `https://picsum.photos/seed/hotel-${i + 1}/400/300`,
+      image: '',
       coordinates: {
         latitude: Number((town.latitude + jitter()).toFixed(5)),
         longitude: Number((town.longitude + jitter()).toFixed(5)),
       },
     });
   }
+  [...hotels]
+    .sort((a, b) => a.finalPrice - b.finalPrice)
+    .forEach((hotel, rank) => {
+      hotel.image = photoPath(rank % PHOTO_COUNT);
+    });
   return hotels;
+}
+
+function photoPath(index: number) {
+  return `images/hotels/${String(index + 1).padStart(2, '0')}.webp`;
 }

@@ -18,9 +18,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    env:
-      # The Cypress binary is not needed here; see the roadmap in the README.
-      CYPRESS_INSTALL_BINARY: 0
     steps:
       - uses: actions/checkout@v4
 
@@ -59,12 +56,10 @@ jobs:
           path: out
 
   # Builds the app served from the root and checks what visitors get:
-  # Lighthouse scores and the size of the JavaScript sent to the browser.
+  # browser tests, Lighthouse scores and the size of the JavaScript sent.
   quality:
-    name: Lighthouse and bundle size
+    name: Browser tests, Lighthouse and bundle size
     runs-on: ubuntu-24.04
-    env:
-      CYPRESS_INSTALL_BINARY: 0
     steps:
       - uses: actions/checkout@v4
 
@@ -82,6 +77,18 @@ jobs:
 
       - name: Bundle-size budget
         run: node scripts/bundle-budget.mjs out 465
+
+      - name: Install the Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser tests (Playwright)
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
 
       - name: Lighthouse
         run: npx -y @lhci/cli@0.15.1 autorun

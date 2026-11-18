@@ -11,21 +11,31 @@ A hotel search page built with Next.js and TypeScript. Hotels are listed next to
 
 ## Screenshot
 
-[![Hotel search page: filters on the left, the hotel list in the middle and a map of Tenerife with markers on the right](docs/screenshots/search.png)](docs/screenshots/search.png)
+[![Hotel search page: star and price filters above a grid of hotel cards, and a map of Tenerife with price markers on the right](docs/screenshots/search.png)](docs/screenshots/search.png)
 
-The list shows only the hotels inside the visible map area. Move or zoom the map and the list follows.
+The list shows only the hotels inside the visible map area. Move or zoom the map and the list follows; hovering a card highlights its price on the map.
+
+| Hotel details | Phone: list | Phone: map |
+| --- | --- | --- |
+| [![Details dialog with a large photo, amenities, the price per night and a Show on map button](docs/screenshots/details.png)](docs/screenshots/details.png) | [![The list on a phone, in Spanish, with a Show map button](docs/screenshots/phone-list.png)](docs/screenshots/phone-list.png) | [![The map on a phone with price markers and a Show list button](docs/screenshots/phone-map.png)](docs/screenshots/phone-map.png) |
 
 ## Features
 
-- **Map and list in sync:** the list shows the hotels inside the visible map area, and each hotel has a marker with a popup.
-- **Filters and sorting:** filter by star rating and price range, sort by price.
+- **Map and list in sync:** the list shows the hotels inside the visible map area. Each listed hotel has a price marker; hovering a card highlights its marker, and clicking a marker opens a small card.
+- **Search, filters and sorting:** search by hotel or town (accents don't matter), filter by star rating and maximum price, and sort by price, star rating or discount.
+- **Hotel details:** a dialog with a large photo, every amenity, the saving per night and a "Show on map" button that flies the map to the hotel.
+- **Clear states:** loading placeholders, an empty state with "Clear filters" and "Reset map", and an error state with "Try again".
+- **Phones:** the list and the map take turns on small screens, with a button to switch.
 - **Infinite scrolling:** more hotels load as you scroll the list.
-- **Two languages:** English and Spanish, with the visitor's browser language picked automatically.
+- **Two languages:** English and Spanish, including prices (€120 or 120 €), with the visitor's browser language picked automatically.
+- **Accessible:** real checkboxes, radio buttons and a native modal dialog under the styling, keyboard focus styles, and WCAG AA text contrast. Lighthouse accessibility is 100.
 - **Own API:** `GET /api/hotels.json` serves 300 generated hotels around real towns in Tenerife.
 
 ## Tech stack
 
-Next.js 14 (App Router) · TypeScript · Zustand · next-intl · MapLibre GL with OpenFreeMap tiles · styled-components · Jest + React Testing Library
+Next.js 14 (App Router) · TypeScript · Tailwind CSS 4 · Zustand · next-intl · MapLibre GL with OpenFreeMap tiles · Jest + React Testing Library · Playwright
+
+Hotel photos are from [Unsplash](https://unsplash.com) ([credits](docs/photo-credits.md)) and are served with the site.
 
 ## Getting started
 
@@ -43,6 +53,7 @@ npm run dev        # http://localhost:3000
 | `npm start`     | Serve the production build           |
 | `npm run lint`  | Run ESLint                           |
 | `npm test`      | Run the tests with a coverage report |
+| `npm run test:e2e` | Run the browser tests (build the static site first, see [Tests](#tests)) |
 
 With Docker:
 
@@ -60,14 +71,21 @@ docker run -p 3000:3000 hotel-listings
 
 ## Tests
 
-`npm test` runs the Jest and React Testing Library tests for the store, the data generator, the API client, the utilities and the components. CI measures line coverage on every push to `main` and publishes the number shown in the badge above.
+- **Unit and component tests:** `npm test` runs 44 Jest and React Testing Library tests for the store, the data generator, the API client, the utilities, every component and the page. CI measures line coverage (98.6%) on every push to `main` and publishes the number shown in the badge above.
+- **Browser tests:** 8 Playwright tests in [`e2e/`](e2e) run against the static build in a real Chromium: the list and its markers, infinite scrolling, filters, search, the details dialog with the keyboard, the language switch, a dark system theme, and the phone layout. To run them locally:
+
+  ```bash
+  STATIC_EXPORT=true npm run build
+  npm run test:e2e
+  ```
 
 ## Quality checks
 
 A second CI job builds the app and checks what visitors get:
 
-- **Lighthouse** (mobile settings): the build fails if accessibility drops below 95 or best practices below 90; performance and SEO are reported. Last run: performance 60, accessibility 100, best practices 100, SEO 100. Measured on `/en/` and `/es/`. Performance is held back by the map and the old stack; improving it is part of the roadmap below.
-- **Bundle budget:** the JavaScript sent to the browser must stay under 465 kB gzip (today: 442.8 kB). To check locally: `STATIC_EXPORT=true npm run build && node scripts/bundle-budget.mjs out 465`.
+- **Browser tests:** the Playwright tests above.
+- **Lighthouse** (mobile settings): the build fails if accessibility drops below 95 or best practices below 90; performance and SEO are reported. Last run (18 Nov 2026, after the redesign): performance 75, accessibility 100, best practices 100, SEO 100 on `/en/` and `/es/`. Before the redesign, performance was 60. The largest paint waits for the hotels, which are fetched in the browser; moving that to the server is roadmap step 4.
+- **Bundle budget:** the JavaScript sent to the browser must stay under 465 kB gzip. Today it is 446.8 kB; before the redesign it was 442.8 kB. The redesign removed styled-components and added the dialog, search and map features. To check locally: `STATIC_EXPORT=true npm run build && node scripts/bundle-budget.mjs out 465`.
 
 The Lighthouse report is attached to each CI run.
 
@@ -97,12 +115,13 @@ Since November 2026 I maintain this repo with an AI coding agent (Claude Code). 
 - Cleaned company and personal data out of the whole git history.
 - Replaced Mapbox with MapLibre and free tiles (no token), added a small hotels API and a static export for GitHub Pages, and set up CI.
 - Added `CONTRIBUTING.md`, `AGENTS.md`, templates, the coverage badge and the Lighthouse and bundle-size checks, and fixed the accessibility problems Lighthouse found.
+- Redesigned the interface with Tailwind CSS (replacing styled-components), added search, the details dialog, price markers and the phone layout, and replaced the Cypress tests with Playwright tests that run in CI.
 
 **How it is checked**
 
 - The agent follows [AGENTS.md](AGENTS.md): commands, conventions and what it must not do.
 - Every change goes through a pull request. I read the diff and merge it myself; nothing is pushed straight to `main`.
-- CI runs lint, type-check and the 21 tests on every pull request, plus the Lighthouse and bundle-size checks.
+- CI runs lint, type-check and the 44 unit tests on every pull request, plus the 8 browser tests and the Lighthouse and bundle-size checks.
 
 **Where it needed correcting**
 
@@ -114,9 +133,7 @@ This repo is being modernized in small pull requests, each with its own before a
 
 1. ✅ Remove the dependency on third-party services and access tokens; add CI and a live demo.
 2. Upgrade to the current Next.js and React versions.
-3. Migrate styled-components to Tailwind CSS, one component per pull request.
+3. ✅ Migrate styled-components to Tailwind CSS. Done together with a full redesign, because every component's look changed.
 4. Move data fetching to TanStack Query and server components.
-5. Replace the Cypress tests with Playwright and run them in CI.
+5. ✅ Replace the Cypress tests with Playwright and run them in CI.
 6. Add German and Dutch.
-
-The Cypress end-to-end tests in [`cypress/`](cypress) are from the original version and are not part of CI yet (step 5).

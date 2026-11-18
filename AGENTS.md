@@ -36,7 +36,7 @@ Report what you ran and the result. If something fails and you can't fix it, say
 
 ```text
 __tests__/            Jest tests, in folders that mirror src/
-cypress/              Original end-to-end tests; not run in CI (see the roadmap)
+e2e/                  Playwright browser tests, run in CI against the static build
 messages/             Translations: en.json, es.json
 mocks/                Test data
 src/
@@ -44,18 +44,16 @@ src/
   app/
     [locale]/         The search page, one statically generated page per language
     api/hotels.json/  Route handler that serves the generated hotels
-  components/         FilterSidebar, HotelCard, HotelList, MapView, layout/Header
-  constants/          Filter options
+  components/         AppHeader, FilterBar, HotelList, HotelCard, HotelDialog, MapView, icons
   data/hotels.ts      Seeded generator: the same 300 hotels on every build
   interfaces/         Shared types
-  store/hotelStore.ts Zustand store: hotels, filters, sort order, map bounds
-  styles/             styled-components, one file per component
+  store/hotelStore.ts Zustand store: hotels, filters, search, sort order, map bounds, dialog
   utils/
 ```
 
 ## Rules
 
-- **Follow the roadmap.** Do one roadmap step at a time and don't mix steps in one pull request. Don't start a migration (Tailwind, TanStack Query, Playwright) unless the task asks for it.
+- **Follow the roadmap.** Do one roadmap step at a time and don't mix steps in one pull request. Don't start a migration (the Next.js upgrade, TanStack Query) unless the task asks for it.
 - **Refactoring keeps behaviour.** Existing tests must pass unchanged. If a test has to change, explain why in the pull request.
 - **Measure, don't estimate.** Before and after numbers in a pull request (bundle size, lines of code, Lighthouse) must come from a command you ran. If you didn't measure it, don't state it.
 - **Types.** No `any`, no `@ts-ignore`, no non-null assertions to silence errors.
@@ -65,7 +63,7 @@ src/
 - **Base path.** The site is served from `/hotel-listings`. Use `next/link` and `NEXT_PUBLIC_BASE_PATH` for asset and API URLs. A hard-coded absolute path breaks the deployment.
 - **No accounts or tokens.** The map uses MapLibre GL and OpenFreeMap because they need neither. Don't add a service that needs a key.
 - **Data is deterministic.** `src/data/hotels.ts` uses a seeded generator. Don't use `Math.random()` or the current date there.
-- **Styling.** styled-components in `src/styles/components`, one `NameStyled.tsx` per component, until the Tailwind migration reaches that component.
+- **Styling.** Tailwind CSS utility classes in the components. Design tokens (brand colours, font) are in the `@theme` block of `src/app/[locale]/globals.css`; use them instead of new hex values. Keep text contrast at WCAG AA or better: `slate-500` is the lightest grey for text on white.
 - **Language.** Code, comments and documentation are in English.
 
 ## Tests
@@ -73,7 +71,7 @@ src/
 - Jest with `next/jest`, React Testing Library and `jest-canvas-mock`. Test files are `__tests__/<area>/Name.test.tsx`.
 - The map library is mocked in tests; jsdom has no WebGL.
 - Query by role and label. Test what the user sees, not implementation details.
-- Don't add Cypress tests. They will be replaced by Playwright.
+- Browser tests are Playwright specs in `e2e/`. Build the static site first: `STATIC_EXPORT=true npm run build && npm run test:e2e`.
 
 ## Guardrails
 

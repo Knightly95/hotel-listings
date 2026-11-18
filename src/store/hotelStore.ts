@@ -1,154 +1,228 @@
 import { create } from 'zustand';
+import type { LngLatBounds } from 'maplibre-gl';
+
 import { fetchHotels } from '@/src/api/api';
 import { Hotel } from '@/src/interfaces/Hotel';
-import type { LngLatBounds } from 'maplibre-gl';
-import { filterData } from '@/src/constants/FilterData';
+import { discountPercent, normalizeText } from '@/src/utils/utils';
+
+export const STAR_OPTIONS = [1, 2, 3, 4, 5] as const;
+/** Upper limits offered by the price filter, in euros per night. */
+export const MAX_PRICE_OPTIONS = [100, 200, 300] as const;
+export const SORT_ORDERS = [
+  'price-asc',
+  'price-desc',
+  'stars-desc',
+  'discount-desc',
+] as const;
+
+export type SortOrder = (typeof SORT_ORDERS)[number];
+export type LoadStatus = 'loading' | 'ready' | 'error';
+export type MobileView = 'list' | 'map';
+
+/** A one-off instruction for the map. `nonce` makes repeated requests distinct. */
+export type MapRequest =
+  | { type: 'focus'; hotelId: string; nonce: number }
+  | { type: 'reset'; nonce: number };
 
 export type HotelsState = {
   hotels: Hotel[];
+  status: LoadStatus;
   filteredHotels: Hotel[];
   paginatedHotels: Hotel[];
   bounds: LngLatBounds | undefined;
-  sortOrder: string;
-  activeFilters: { [key: string]: Set<string> };
-  filters: any;
+  sortOrder: SortOrder;
+  /** Star ratings to show. Empty means every rating. */
+  stars: number[];
+  /** Highest price per night to show. `null` means any price. */
+  maxPrice: number | null;
+  query: string;
   hasMore: boolean;
   currentPage: number;
   pageSize: number;
+  /** The hotel under the pointer or keyboard focus, highlighted on the map and in the list. */
+  hoveredHotelId: string | null;
+  /** The hotel shown in the details dialog. */
+  selectedHotelId: string | null;
+  mapRequest: MapRequest | null;
+  /** Which half of the page is shown on small screens. */
+  mobileView: MobileView;
+  fetchHotelsData: () => Promise<void>;
   filterAndSortHotels: () => void;
   handleLoadMore: () => void;
   handleSortChange: (value: string) => void;
-  handleFilterChange: (
-    filterTitle: string,
-    optionValue: string,
-    isChecked: boolean
-  ) => void;
-  fetchHotelsData: () => Promise<void>;
+  toggleStar: (star: number) => void;
+  setMaxPrice: (maxPrice: number | null) => void;
+  setQuery: (query: string) => void;
+  clearFilters: () => void;
   handleChangeBounds: (bounds: LngLatBounds | undefined) => void;
+  setHoveredHotel: (hotelId: string | null) => void;
+  openHotel: (hotelId: string) => void;
+  closeHotel: () => void;
+  showHotelOnMap: (hotelId: string) => void;
+  resetMap: () => void;
+  setMobileView: (view: MobileView) => void;
 };
 
-function getFilteredHotels(hotels: Hotel[], activeFilters: any) {
-  return hotels.filter((hotel: Hotel) => {
-    return Object.keys(activeFilters).every((filterKey) => {
-      const filterValues = Array.from(activeFilters[filterKey] || []);
-      if (filterKey === 'Stars') {
-        return filterValues.includes(hotel.star.toString());
-      }
-      if (filterKey === 'Price Range') {
-        if (filterValues.includes('under-100') && hotel.finalPrice < 100)
-          return true;
-        if (filterValues.includes('under-200') && hotel.finalPrice < 200)
-          return true;
-        if (filterValues.includes('under-300') && hotel.finalPrice < 300)
-          return true;
-      }
-      return false;
-    });
-  });
+export function countActiveFilters(
+  state: Pick<HotelsState, 'stars' | 'maxPrice' | 'query'>
+) {
+  return (
+    state.stars.length +
+    (state.maxPrice === null ? 0 : 1) +
+    (state.query.trim() ? 1 : 0)
+  );
+}
+
+export function getFilteredHotels(
+  hotels: Hotel[],
+  { stars, maxPrice, query }: Pick<HotelsState, 'stars' | 'maxPrice' | 'query'>
+) {
+  const search = normalizeText(query);
+  return hotels.filter(
+    (hotel) =>
+      (stars.length === 0 || stars.includes(hotel.star)) &&
+      (maxPrice === null || hotel.finalPrice < maxPrice) &&
+      (search === '' ||
+        normalizeText(`${hotel.name} ${hotel.town}`).includes(search))
+  );
 }
 
 function getHotelsInBounds(hotels: Hotel[], bounds: LngLatBounds) {
-  return hotels.filter((hotel) => {
-    return bounds.contains([
-      hotel.coordinates.longitude,
-      hotel.coordinates.latitude,
-    ]);
-  });
+  return hotels.filter((hotel) =>
+    bounds.contains([hotel.coordinates.longitude, hotel.coordinates.latitude])
+  );
 }
 
-function sortHotels(hotels: Hotel[], sortOrder: string) {
-  return hotels.sort((a, b) => {
-    if (sortOrder === 'price-asc') {
-      return a.finalPrice - b.finalPrice;
-    }
-    if (sortOrder === 'price-desc') {
-      return b.finalPrice - a.finalPrice;
-    }
-    return 0;
-  });
+const comparators: Record<SortOrder, (a: Hotel, b: Hotel) => number> = {
+  'price-asc': (a, b) => a.finalPrice - b.finalPrice,
+  'price-desc': (a, b) => b.finalPrice - a.finalPrice,
+  'stars-desc': (a, b) => b.star - a.star || a.finalPrice - b.finalPrice,
+  'discount-desc': (a, b) =>
+    discountPercent(b.originalPrice, b.finalPrice) -
+      discountPercent(a.originalPrice, a.finalPrice) ||
+    a.finalPrice - b.finalPrice,
+};
+
+export function sortHotels(hotels: Hotel[], sortOrder: SortOrder) {
+  return [...hotels].sort(comparators[sortOrder]);
 }
 
-const useHotels = create<HotelsState>((set) => ({
+const isSortOrder = (value: string): value is SortOrder =>
+  (SORT_ORDERS as readonly string[]).includes(value);
+
+let nonce = 0;
+
+const useHotels = create<HotelsState>((set, get) => ({
   hotels: [],
+  status: 'loading',
   filteredHotels: [],
   paginatedHotels: [],
   bounds: undefined,
   sortOrder: 'price-asc',
-  activeFilters: {},
-  filters: filterData,
+  stars: [],
+  maxPrice: null,
+  query: '',
   hasMore: false,
   currentPage: 1,
-  pageSize: 5,
+  pageSize: 12,
+  hoveredHotelId: null,
+  selectedHotelId: null,
+  mapRequest: null,
+  mobileView: 'list',
+
   fetchHotelsData: async () => {
-    const hotelsData = await fetchHotels();
-    set({ hotels: hotelsData });
+    set({ status: 'loading' });
+    try {
+      const hotels = await fetchHotels();
+      set({ hotels, status: 'ready' });
+    } catch {
+      set({ status: 'error' });
+    }
+    get().filterAndSortHotels();
   },
+
   filterAndSortHotels: () => {
     set((state) => {
-      const { activeFilters, bounds, sortOrder, hotels, pageSize } = state;
-
-      let filteredHotels = getFilteredHotels(hotels, activeFilters);
-
-      if (bounds) {
-        filteredHotels = getHotelsInBounds(filteredHotels, bounds);
+      let filteredHotels = getFilteredHotels(state.hotels, state);
+      if (state.bounds) {
+        filteredHotels = getHotelsInBounds(filteredHotels, state.bounds);
       }
-
-      filteredHotels = sortHotels(filteredHotels, sortOrder);
-      const paginatedHotels = filteredHotels.slice(0, pageSize);
-      const hasMore = filteredHotels.length > pageSize;
+      filteredHotels = sortHotels(filteredHotels, state.sortOrder);
 
       return {
         filteredHotels,
-        paginatedHotels,
-        hasMore,
+        paginatedHotels: filteredHotels.slice(0, state.pageSize),
+        hasMore: filteredHotels.length > state.pageSize,
         currentPage: 1,
       };
     });
   },
+
   handleLoadMore: () => {
     set((state) => {
-      const startIndex = state.currentPage * state.pageSize;
-      const endIndex = startIndex + state.pageSize;
-      const nextPage = state.filteredHotels.slice(startIndex, endIndex);
-      const paginatedHotels = [...state.paginatedHotels, ...nextPage];
-
-      const currentPage = state.currentPage + 1;
-      const hasMore = state.filteredHotels.length > paginatedHotels.length;
-
+      const end = (state.currentPage + 1) * state.pageSize;
+      const paginatedHotels = state.filteredHotels.slice(0, end);
       return {
-        currentPage,
+        currentPage: state.currentPage + 1,
         paginatedHotels,
-        hasMore,
+        hasMore: state.filteredHotels.length > paginatedHotels.length,
       };
     });
   },
-  handleSortChange: (value: string) => {
+
+  handleSortChange: (value) => {
+    if (!isSortOrder(value)) return;
     set({ sortOrder: value });
+    get().filterAndSortHotels();
   },
-  handleFilterChange: (
-    filterTitle: string,
-    optionValue: string,
-    isChecked: boolean
-  ) => {
-    set((state) => {
-      const newFilters = { ...state.activeFilters };
-      if (isChecked) {
-        if (!newFilters[filterTitle]) {
-          newFilters[filterTitle] = new Set();
-        }
-        newFilters[filterTitle].add(optionValue);
-      } else {
-        newFilters[filterTitle]?.delete(optionValue);
-        if (newFilters[filterTitle]?.size === 0) {
-          delete newFilters[filterTitle];
-        }
-      }
-      return { activeFilters: newFilters };
+
+  toggleStar: (star) => {
+    const { stars } = get();
+    set({
+      stars: stars.includes(star)
+        ? stars.filter((selected) => selected !== star)
+        : [...stars, star].sort((a, b) => a - b),
     });
+    get().filterAndSortHotels();
   },
+
+  setMaxPrice: (maxPrice) => {
+    set({ maxPrice });
+    get().filterAndSortHotels();
+  },
+
+  setQuery: (query) => {
+    set({ query });
+    get().filterAndSortHotels();
+  },
+
+  clearFilters: () => {
+    set({ stars: [], maxPrice: null, query: '' });
+    get().filterAndSortHotels();
+  },
+
   handleChangeBounds: (bounds) => {
     set({ bounds });
+    get().filterAndSortHotels();
   },
+
+  setHoveredHotel: (hotelId) => set({ hoveredHotelId: hotelId }),
+
+  openHotel: (hotelId) => set({ selectedHotelId: hotelId }),
+
+  closeHotel: () => set({ selectedHotelId: null }),
+
+  showHotelOnMap: (hotelId) =>
+    set({
+      selectedHotelId: null,
+      hoveredHotelId: hotelId,
+      mobileView: 'map',
+      mapRequest: { type: 'focus', hotelId, nonce: ++nonce },
+    }),
+
+  resetMap: () => set({ mapRequest: { type: 'reset', nonce: ++nonce } }),
+
+  setMobileView: (view) => set({ mobileView: view }),
 }));
 
 export default useHotels;

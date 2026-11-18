@@ -1,18 +1,17 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
-import type { Metadata } from 'next';
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from 'next-intl/server';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 
 import { locales } from '@/src/i18n';
 
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'Hotel Finder',
-  description: 'Find hotels on a map: filter, sort and browse in English or Spanish',
-};
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 /** Pre-render one page per language, which a static export requires. */
 export function generateStaticParams() {
@@ -25,6 +24,21 @@ interface RootLayoutProps {
     locale: string;
   };
 }
+
+export async function generateMetadata({
+  params: { locale },
+}: Omit<RootLayoutProps, 'children'>): Promise<Metadata> {
+  const t = await getTranslations({ locale });
+  return {
+    title: t('meta-title'),
+    description: t('meta-description'),
+  };
+}
+
+export const viewport: Viewport = {
+  themeColor: '#ffffff',
+};
+
 export default async function LocaleLayout({
   children,
   params: { locale },
@@ -32,8 +46,8 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   const messages = await getMessages();
   return (
-    <html lang={locale}>
-      <body className={inter.className}>
+    <html lang={locale} className={inter.variable}>
+      <body>
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>
