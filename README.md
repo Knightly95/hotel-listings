@@ -79,6 +79,26 @@ STATIC_EXPORT=true NEXT_PUBLIC_BASE_PATH=/hotel-listings npm run build   # outpu
 
 Without them, `npm run build` produces a normal Next.js server build.
 
+## How AI was used
+
+Since November 2026 I maintain this repo with an AI coding agent (Claude Code). The original assessment code is described in the background note at the top.
+
+**What the agent did**
+
+- Cleaned company and personal data out of the whole git history.
+- Replaced Mapbox with MapLibre and free tiles (no token), added a small hotels API and a static export for GitHub Pages, and set up CI.
+- Added `CONTRIBUTING.md`, `AGENTS.md`, templates, the coverage badge and the Lighthouse and bundle-size checks, and fixed the accessibility problems Lighthouse found.
+
+**How it is checked**
+
+- The agent follows [AGENTS.md](AGENTS.md): commands, conventions and what it must not do.
+- Every change goes through a pull request. I read the diff and merge it myself; nothing is pushed straight to `main`.
+- CI runs lint, type-check and the 21 tests on every pull request, plus the Lighthouse and bundle-size checks.
+
+**Where it needed correcting**
+
+Making the map markers accessible broke a test, because the test's stand-in for the map library had no `getElement` method. The stand-in was completed; the test was not weakened or removed.
+
 ## Roadmap
 
 This repo is being modernized in small pull requests, each with its own before and after measurements:
