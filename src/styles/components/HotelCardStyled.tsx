@@ -91,7 +91,7 @@ export const Feature = styled.span`
 export const Button = styled.button`
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
-  background-color: #007bff;
+  background-color: #0062cc;
   color: white;
   border: none;
   border-radius: 4px;
@@ -102,7 +102,7 @@ export const Button = styled.button`
   transition: background-color 0.3s, transform 0.3s;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #004a99;
   }
 
   &:active {

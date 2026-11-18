@@ -8,6 +8,7 @@ jest.mock('maplibre-gl', () => {
       setPopup: jest.fn().mockReturnThis(),
       addTo: jest.fn().mockReturnThis(),
       remove: jest.fn(),
+      getElement: jest.fn(() => document.createElement('div')),
     })),
     Popup: jest.fn(() => ({
       setLngLat: jest.fn().mockReturnThis(),

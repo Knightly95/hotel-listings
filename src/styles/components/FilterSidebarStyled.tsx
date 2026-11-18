@@ -13,8 +13,9 @@ export const Card = styled.div`
   background-color: #fff;
 `;
 
-export const FilterTitle = styled.h3`
+export const FilterTitle = styled.h2`
   margin-bottom: 0.5rem;
+  font-size: 1.17em;
 `;
 
 export const FilterCheckbox = styled.div`

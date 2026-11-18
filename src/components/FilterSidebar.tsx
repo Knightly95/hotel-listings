@@ -34,6 +34,7 @@ const FilterSidebar: React.FC = () => {
             {filter.options.map((option) => (
               <FilterCheckbox key={option.value}>
                 <input
+                  id={`filter-${filter.title}-${option.value}`}
                   type="checkbox"
                   value={option.value}
                   onChange={(e) =>
@@ -45,7 +46,7 @@ const FilterSidebar: React.FC = () => {
                   }
                   data-testid={`checkbox-${option.value}`}
                 />
-                <label>
+                <label htmlFor={`filter-${filter.title}-${option.value}`}>
                   {filter.title === 'Stars'
                     ? t('star-rating', {
                         rating: option.value,

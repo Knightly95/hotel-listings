@@ -4,15 +4,15 @@ import styled, { keyframes } from 'styled-components';
 export const pulse = keyframes`
   0% {
     transform: scale(1);
-    background-color: #007bff;
+    background-color: #0062cc;
   }
   50% {
     transform: scale(1.05);
-    background-color: #0056b3;
+    background-color: #004a99;
   }
   100% {
     transform: scale(1);
-    background-color: #007bff;
+    background-color: #0062cc;
   }
 `;
 
@@ -36,7 +36,7 @@ export const CardWrapper = styled.div`
 export const LoadMoreButton = styled.button`
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
-  background-color: #007bff;
+  background-color: #0062cc;
   color: white;
   border: none;
   border-radius: 4px;

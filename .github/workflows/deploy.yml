@@ -58,6 +58,40 @@ jobs:
         with:
           path: out
 
+  # Builds the app served from the root and checks what visitors get:
+  # Lighthouse scores and the size of the JavaScript sent to the browser.
+  quality:
+    name: Lighthouse and bundle size
+    runs-on: ubuntu-24.04
+    env:
+      CYPRESS_INSTALL_BINARY: 0
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          STATIC_EXPORT: true
+
+      - name: Bundle-size budget
+        run: node scripts/bundle-budget.mjs out 465
+
+      - name: Lighthouse
+        run: npx -y @lhci/cli@0.15.1 autorun
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: lighthouse-report
+
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: build

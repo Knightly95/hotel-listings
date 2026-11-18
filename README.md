@@ -62,6 +62,15 @@ docker run -p 3000:3000 hotel-listings
 
 `npm test` runs the Jest and React Testing Library tests for the store, the data generator, the API client, the utilities and the components. CI measures line coverage on every push to `main` and publishes the number shown in the badge above.
 
+## Quality checks
+
+A second CI job builds the app and checks what visitors get:
+
+- **Lighthouse** (mobile settings): the build fails if accessibility drops below 95 or best practices below 90; performance and SEO are reported. Last run: performance 60, accessibility 100, best practices 100, SEO 100. Measured on `/en/` and `/es/`. Performance is held back by the map and the old stack; improving it is part of the roadmap below.
+- **Bundle budget:** the JavaScript sent to the browser must stay under 465 kB gzip (today: 442.8 kB). To check locally: `STATIC_EXPORT=true npm run build && node scripts/bundle-budget.mjs out 465`.
+
+The Lighthouse report is attached to each CI run.
+
 ## Contributing
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): setup, checks, conventions and how to propose a change.

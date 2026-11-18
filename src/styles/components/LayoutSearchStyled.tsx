@@ -86,13 +86,13 @@ export const MapContainer = styled.div`
 `;
 
 export const HomeButton = styled.button`
-  background-color: #007bff;
+  background-color: #0062cc;
   color: #fff;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
   &:hover {
-    background-color: #0056b3;
+    background-color: #004a99;
   }
 `;

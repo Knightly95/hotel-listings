@@ -5,6 +5,7 @@
   "km-from-location": "{km} Km from location",
   "star-rating": "{rating, plural, =1 {1 Star} other {# Stars}}",
   "price-filter": "Under {price}",
+  "sort-by": "Sort by",
   "price-asc": "Price: Low to High",
   "price-desc": "Price: High to Low",
   "hotels": "Hotels",

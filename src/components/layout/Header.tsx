@@ -14,8 +14,11 @@ const Header: React.FC = () => {
 
   return (
     <HeaderContainer>
-      <h1>{t('hotels')}</h1>
-      <SortSelect onChange={(e) => handleSortChange(e.target.value)}>
+      <h2>{t('hotels')}</h2>
+      <SortSelect
+        aria-label={t('sort-by')}
+        onChange={(e) => handleSortChange(e.target.value)}
+      >
         <option value="price-asc">{t('price-asc')}</option>
         <option value="price-desc">{t('price-desc')}</option>
       </SortSelect>
